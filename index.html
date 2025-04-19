@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .task-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container task-container">
+        <h2 class="text-center">Task Manager</h2>
+        <div class="input-group mb-3">
+            <input type="text" id="taskInput" class="form-control" placeholder="Add a new task">
+            <div class="input-group-append">
+                <button class="btn btn-primary" id="addTaskBtn">Add Task</button>
+            </div>
+        </div>
+        <ul class="list-group" id="taskList"></ul>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+
+        function renderTasks() {
+            $('#taskList').empty();
+            tasks.forEach((task, index) => {
+                $('#taskList').append(`
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        ${task}
+                        <div>
+                            <button class="btn btn-warning btn-sm edit-btn" data-index="${index}">Edit</button>
+                            <button class="btn btn-danger btn-sm delete-btn" data-index="${index}">Delete</button>
+                        </div>
+                    </li>
+                `);
+            });
+        }
+
+        $('#addTaskBtn').click(function() {
+            const taskInput = $('#taskInput').val();
+            if (taskInput) {
+                tasks.push(taskInput);
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+                $('#taskInput').val('');
+                renderTasks();
+            }
+        });
+
+        $(document).on('click', '.delete-btn', function() {
+            const index = $(this).data('index');
+            tasks.splice(index, 1);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        });
+
+        $(document).on('click', '.edit-btn', function() {
+            const index = $(this).data('index');
+            const task = tasks[index];
+            $('#taskInput').val(task);
+            tasks.splice(index, 1);
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            renderTasks();
+        });
+
+        $(document).ready(function() {
+            renderTasks();
+        });
+    </script>
+</body>
+</html>
